@@ -6,7 +6,7 @@ import random
 import re
 
 
-def type_validator(types):
+def type_validator(types: list):
     """
     All input parameters must be of correct type. Column name is tested separately.
     """
@@ -22,7 +22,7 @@ def col_name_validator(col_name):
         raise ValueError(f'Parameter col_name with value "{col_name}" is invalid. Use non-empty string.')
 
 
-def col_name_warning(col_name, columns):
+def col_name_warning(col_name: str, columns):
     """
     Warn if column with given name exists.
     """
@@ -30,7 +30,7 @@ def col_name_warning(col_name, columns):
         warnings.warn(f'Column with name "{col_name}" already in use. Overwriting.')
 
 
-def none_ratio_validator(allow_none, none_ratio):
+def none_ratio_validator(allow_none: bool, none_ratio: int):
     """
     Value must be between 0 and 100.
     """
@@ -38,7 +38,7 @@ def none_ratio_validator(allow_none, none_ratio):
         raise ValueError('Value of none_ratio not in range 0-100.')
 
 
-def cat_validator(categories):
+def cat_validator(categories: list):
     """
     At least 1 category must be provided.
     """
@@ -46,20 +46,13 @@ def cat_validator(categories):
         raise ValueError('No categories provided.')
 
 
-def date_validator(start_date, end_date):
+def date_validator(start_date: str, end_date: str):
     """
     Checks if provided dates are in YYYY-MM-DD format.
     Does not check if value is valid (eg. 2023-50-50 will pass the check).
     """
     if not (re.match(r'^\d{4}-[01][1-9]-\d{2}$', start_date) and re.match(r'^\d{4}-\d{2}-\d{2}$', end_date)):
         raise ValueError('Incorrect date format.')
-
-
-def get_max_rand(rand_proba: int) -> int:
-    """
-    Returns max_rand.
-    """
-    return 100 + rand_proba
 
 
 def get_rand_int(min_val: int, max_val: int) -> int:
@@ -83,7 +76,7 @@ def get_rand_cat(categories: list):
     return random.choice(categories)
 
 
-def get_rand_date(min_date, max_date):
+def get_rand_date(min_date: datetime, max_date: datetime):
     """
     Returns random datetime between start and end date.
     """
@@ -92,6 +85,13 @@ def get_rand_date(min_date, max_date):
     random_timestamp = random.randint(min_timestamp, max_timestamp)
 
     return datetime.fromtimestamp(random_timestamp)
+
+
+def prob_eval(max_prob: int):
+    """
+    Returns True or False with probability of max_prob [%].
+    """
+    return np.random.randint(0, 100) >= max_prob
 
 
 class SDG:
@@ -106,7 +106,7 @@ class SDG:
         self.columns = {}
 
     def add_int_col(self, col_name: str, min_val: int = 0, max_val: int = 100,
-                    allow_none: bool = False, none_proba: int = 10):
+                    allow_none: bool = False, none_prob: int = 10):
         """
         Adds integer column with specified parameters.
         Performs basic parameter validation.
@@ -115,19 +115,19 @@ class SDG:
         :param min_val: Minimum value in column.
         :param max_val: Maximum value in column.
         :param allow_none: Column may contain None values if True.
-        :param none_proba: Probablity of None values in column. Int range 0-100.
+        :param none_prob: Probablity of None values in column. Int range 0-100.
         """
         type_validator([isinstance(min_val, int), isinstance(max_val, int),
-                        isinstance(allow_none, bool), isinstance(none_proba, int)])
+                        isinstance(allow_none, bool), isinstance(none_prob, int)])
         col_name_validator(col_name)
         col_name_warning(col_name, self.columns.keys())
-        none_ratio_validator(allow_none, none_proba)
+        none_ratio_validator(allow_none, none_prob)
 
         self.columns[col_name] = {'col_type': 'Int64', 'min_val': min_val, 'max_val': max_val,
-                                  'allow_none': allow_none, 'none_proba': none_proba}
+                                  'allow_none': allow_none, 'none_prob': none_prob}
 
     def add_float_col(self, col_name: str, min_val: float = 0.0, max_val: float = 100.0,
-                      allow_none: bool = False, none_proba: int = 10):
+                      allow_none: bool = False, none_prob: int = 10):
         """
         Adds float column with specified parameters.
         Performs basic parameter validation.
@@ -136,18 +136,18 @@ class SDG:
         :param min_val: Minimum value in column.
         :param max_val: Maximum value in column.
         :param allow_none: Column may contain None values if True.
-        :param none_proba: Probablity of None values in column. Int range 0-100.
+        :param none_prob: Probablity of None values in column. Int range 0-100.
         """
         type_validator([isinstance(min_val, float), isinstance(max_val, float),
-                        isinstance(allow_none, bool), isinstance(none_proba, int)])
+                        isinstance(allow_none, bool), isinstance(none_prob, int)])
         col_name_validator(col_name)
         col_name_warning(col_name, self.columns.keys())
-        none_ratio_validator(allow_none, none_proba)
+        none_ratio_validator(allow_none, none_prob)
 
         self.columns[col_name] = {'col_type': 'Float64', 'min_val': min_val, 'max_val': max_val,
-                                  'allow_none': allow_none, 'none_proba': none_proba}
+                                  'allow_none': allow_none, 'none_prob': none_prob}
 
-    def add_cat_col(self, col_name: str, categories: list, allow_none: bool = False, none_proba: int = 10):
+    def add_cat_col(self, col_name: str, categories: list, allow_none: bool = False, none_prob: int = 10):
         """
         Adds categorical column with specified parameters.
         Performs basic parameter validation.
@@ -155,19 +155,19 @@ class SDG:
         :param col_name: Column name to be used in DataFrame. Use non-empty string.
         :param categories: List of categories to choose from.
         :param allow_none: Column may contain None values if True.
-        :param none_proba: Probablity of None values in column. Int range 0-100.
+        :param none_prob: Probablity of None values in column. Int range 0-100.
         """
-        type_validator([isinstance(categories, list), isinstance(allow_none, bool), isinstance(none_proba, int)])
+        type_validator([isinstance(categories, list), isinstance(allow_none, bool), isinstance(none_prob, int)])
         col_name_validator(col_name)
         col_name_warning(col_name, self.columns.keys())
-        none_ratio_validator(allow_none, none_proba)
+        none_ratio_validator(allow_none, none_prob)
         cat_validator(categories)
 
         self.columns[col_name] = {'col_type': 'object', 'categories': categories,
-                                  'allow_none': allow_none, 'none_proba': none_proba}
+                                  'allow_none': allow_none, 'none_prob': none_prob}
 
     def add_datetime_col(self, col_name: str, min_date: str = '2000-01-01', max_date: str = '2023-12-31',
-                         allow_none: bool = False, none_proba: int = 10):
+                         allow_none: bool = False, none_prob: int = 10):
         """
         Adds datetime column with specified parameters.
         Performs basic parameter validation.
@@ -176,21 +176,21 @@ class SDG:
         :param min_date: Start date in YYYY-MM-DD format.
         :param max_date: End date in YYYY-MM-DD format.
         :param allow_none: Column may contain None values if True.
-        :param none_proba: Probablity of None values in column. Int range 0-100.
+        :param none_prob: Probablity of None values in column. Int range 0-100.
 
         """
         type_validator([isinstance(min_date, str), isinstance(max_date, str),
-                        isinstance(allow_none, bool), isinstance(none_proba, int)])
+                        isinstance(allow_none, bool), isinstance(none_prob, int)])
         col_name_validator(col_name)
         col_name_warning(col_name, self.columns.keys())
-        none_ratio_validator(allow_none, none_proba)
+        none_ratio_validator(allow_none, none_prob)
         date_validator(min_date, max_date)
 
         min_date = datetime.strptime(min_date, '%Y-%m-%d')
         max_date = datetime.strptime(max_date, '%Y-%m-%d')
 
         self.columns[col_name] = {'col_type': 'datetime64', 'start_date': min_date, 'end_date': max_date,
-                                  'allow_none': allow_none, 'none_proba': none_proba}
+                                  'allow_none': allow_none, 'none_prob': none_prob}
 
     def generate_dataframe(self, rows: int = 100) -> pd.DataFrame:
         """
@@ -205,25 +205,25 @@ class SDG:
         d_types = {}
 
         for c, v in self.columns.items():  # c - col_name, v - values
-            if v['allow_none']:
-                max_rand = get_max_rand(v['none_proba'])
+            if v['allow_none'] and v['none_prob'] > 0:
+                max_prob = v['none_prob']
             else:
-                max_rand = 1
+                max_prob = 0
 
             if v['col_type'] == 'Int64':
-                rand_values = [get_rand_int(v['min_val'], v['max_val']) if np.random.randint(0, max_rand) < 100
+                rand_values = [get_rand_int(v['min_val'], v['max_val']) if prob_eval(max_prob)
                                else pd.NA
                                for _ in range(rows)]
             elif v['col_type'] == 'Float64':
-                rand_values = [get_rand_float(v['min_val'], v['max_val']) if np.random.randint(0, max_rand) < 100
+                rand_values = [get_rand_float(v['min_val'], v['max_val']) if prob_eval(max_prob)
                                else pd.NA
                                for _ in range(rows)]
             elif v['col_type'] == 'object':
-                rand_values = [get_rand_cat(v['categories']) if np.random.randint(0, max_rand) < 100
+                rand_values = [get_rand_cat(v['categories']) if prob_eval(max_prob)
                                else pd.NA
                                for _ in range(rows)]
             else:
-                rand_values = [get_rand_date(v['start_date'], v['end_date']) if np.random.randint(0, max_rand) < 100
+                rand_values = [get_rand_date(v['start_date'], v['end_date']) if prob_eval(max_prob)
                                else pd.NA
                                for _ in range(rows)]
 
