@@ -3,6 +3,12 @@ ___
 
 **_Personal project to generate pandas DataFrame quick and easy._**
 
+## Installation
+
+```
+pip install simple_dataframe_generator
+```
+
 ## Supported column types
 
 1. Integer - ```add_int_col()```
@@ -27,7 +33,7 @@ sdg = SDG()
 sdg.add_int_col(col_name='age', min_val=0, max_val=99)
 
 # add integer column with specified parameters, allow missing values
-sdg.add_int_col(col_name='favorite_number', min_val=-100, max_val=100, allow_none=True, none_proba=10)
+sdg.add_int_col(col_name='favorite_number', min_val=-100, max_val=100, allow_none=True, none_prob=10)
 
 # add float column with specified parameters
 sdg.add_float_col('distance', min_val=0.0, max_val=200.0)
