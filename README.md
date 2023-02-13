@@ -6,7 +6,7 @@ ___
 ## Installation
 
 ```
-pip install simple-dataframe-generator==1.0.1
+pip install simple-dataframe-generator==1.0.2
 ```
 
 ## Supported column types
