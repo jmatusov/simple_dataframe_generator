@@ -1,7 +1,6 @@
-import sys
-
 from simple_dataframe_generator import SDG
-import numpy as np
+
+
 sdg = SDG()
 
 # add integer column with specified parameters
@@ -22,5 +21,3 @@ sdg.add_datetime_col('last_seen', min_date='2020-01-01', max_date='2023-02-01')
 
 # generate pandas DataFrame with specific row count
 df = sdg.generate_dataframe(rows=10)
-print(df.to_markdown())
-pass
