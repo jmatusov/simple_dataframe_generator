@@ -6,7 +6,7 @@ ___
 ## Installation
 
 ```
-pip install simple_dataframe_generator
+pip install simple-dataframe-generator==1.0.1
 ```
 
 ## Supported column types
@@ -24,10 +24,10 @@ All column types support ```allow_none```.
 ```python
 import pandas as pd
 import numpy as np
-from simple_dataframe_generator import SDG
+from simple_dataframe_generator import simple_dataframe_generator
 
 
-sdg = SDG()
+sdg = simple_dataframe_generator.SDG()
 
 # add integer column with specified parameters
 sdg.add_int_col(col_name='age', min_val=0, max_val=99)
