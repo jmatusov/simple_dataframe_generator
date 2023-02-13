@@ -8,7 +8,7 @@ ___
 1. Integer - ```add_int_col()```
 2. Float - ```add_float_col()```
 3. Categorical - ```add_cat_col()```
-4. Date - ```add_date_col()```
+4. Datetime - ```add_datetime_col()```
 
 All column types support ```allow_none```.
 
